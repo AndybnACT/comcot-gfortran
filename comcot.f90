@@ -420,6 +420,7 @@
       IF (LO%LAYGOV .GT. 1) THEN
           LO%M0(:,:)   = LO%M(:,:,1)
           LO%N0(:,:) = LO%N(:,:,1)
+          LO%DZ(:,:,1) = LO%DZ(:,:,2)
       ENDIF
       LO%Z(:,:,1) = LO%Z(:,:,2)
       LO%M(:,:,1) = LO%M(:,:,2)
