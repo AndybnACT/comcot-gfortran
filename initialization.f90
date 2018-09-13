@@ -1921,7 +1921,7 @@
       REWIND(23)
 	  DO I = 1,COUNT
          READ (23,*) XCOL(I), YCOL(I), ZCOL(I)
-		 IF (ISNAN(ZCOL(I))) ZCOL(I) = 9999.0
+		 IF (ZCOL(I)/=ZCOL(I)) ZCOL(I) = 9999.0
 		 IF (ABS(ZCOL(I)).GE.HUGE(ZCOL(I))) ZCOL(I) = 9999.0
 	  END DO
 	  CLOSE (23)
@@ -2118,7 +2118,7 @@
      REWIND(23)
 	  DO I = 1,COUNT
          READ (23,*) XCOL(I), YCOL(I), ZCOL(I)
-		 IF (ISNAN(ZCOL(I))) ZCOL(I) = 9999.0
+		 IF (ZCOL(I)/=ZCOL(I)) ZCOL(I) = 9999.0
 		 IF (ABS(ZCOL(I)).GE.HUGE(ZCOL(I))) ZCOL(I) = 9999.0
 		 IF (XCOL(I).LT.0.0) XCOL(I) = XCOL(I) + 360.0
 		 ZCOL(I) = -ZCOL(I)
@@ -2583,7 +2583,7 @@
 	  REWIND(23)
 	  DO I = 1,COUNT
          READ (23,*) XCOL(I), YCOL(I), ZCOL(I)
-		 IF (ISNAN(ZCOL(I))) ZCOL(I) = 0.0
+		 IF (ZCOL(I)/=ZCOL(I)) ZCOL(I) = 0.0
 		 IF (ABS(ZCOL(I)).GE.HUGE(ZCOL(I))) ZCOL(I) = 0.0
 	  END DO
 	  CLOSE (23)
@@ -2736,7 +2736,7 @@
       REWIND(23)
 	  DO I = 1,COUNT
          READ (23,*) XCOL(I), YCOL(I), ZCOL(I)
-		 IF (ISNAN(ZCOL(I))) ZCOL(I) = 9999.0
+		 IF (ZCOL(I)/=ZCOL(I)) ZCOL(I) = 9999.0
 		 IF (ABS(ZCOL(I)).GE.HUGE(ZCOL(I))) ZCOL(I) = 9999.0
 	  END DO
 	  CLOSE (23)
