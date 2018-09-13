@@ -173,8 +173,8 @@
 
 			IF (ABS(US) .GE. HUGE(US)) US = 0.0
 			IF (ABS(UD) .GE. HUGE(UD)) UD = 0.0
-			IF (ISNAN(US)) US = 0.0
-			IF (ISNAN(UD)) UD = 0.0
+			IF (US/=US) US = 0.0
+			IF (UD/=UD) UD = 0.0
 			IF (ABS(US) .LE. GX) US = 0.0
 			IF (ABS(UD) .LE. GX) UD = 0.0
 
@@ -343,8 +343,8 @@
 
 			IF (ABS(US).GE.HUGE(US)) US = 0.0
 			IF (ABS(UD).GE.HUGE(UD)) UD = 0.0
-			IF (ISNAN(US)) US = 0.0
-			IF (ISNAN(UD)) UD = 0.0
+			IF (US/=US) US = 0.0
+			IF (UD/=UD) UD = 0.0
 			IF (ABS(US) .LE. GX) US = 0.0
 			IF (ABS(UD) .LE. GX) UD = 0.0
 
@@ -690,7 +690,7 @@
       DO J=1,NY
         READ (23,*) (TMP(I,J), I=1,NX)
 		DO I = 1,NX
-		   IF (ISNAN(TMP(I,J))) TMP(I,J) = 0.0
+		   IF (TMP(I,J)/=TMP(I,J)) TMP(I,J) = 0.0
 		   IF (ABS(TMP(I,J)).GE.HUGE(TMP(I,J))) TMP(I,J) = 0.0
 		ENDDO
       END DO
@@ -794,7 +794,7 @@
       REWIND(23)
 	  DO I = 1,COUNT
          READ (23,*) XCOL(I), YCOL(I), ZCOL(I)
-		 IF (ISNAN(ZCOL(I))) ZCOL(I) = 0.0
+		 IF (ZCOL(I)/=ZCOL(I)) ZCOL(I) = 0.0
 		 IF (ABS(ZCOL(I)).GE.HUGE(ZCOL(I))) ZCOL(I) = 0.0
 	  END DO
 	  CLOSE (23)
