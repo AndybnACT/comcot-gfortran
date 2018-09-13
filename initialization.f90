@@ -2425,7 +2425,6 @@
 
 !.....UPDATE FIRST-LEVEL GRIDS
       LO%H(:,:) = LO%H(:,:) - LO%DEFORM(:,:)
-      WRITE(*,*) "[WARNING] UPDATING H"
 	  IF (LO%INI_SWITCH.EQ.3 .OR. LO%INI_SWITCH.EQ.4) THEN
 	     LO%HT(:,:,1) = LO%HT(:,:,1) - LO%DEFORM(:,:)
 	     LO%HT(:,:,2) = LO%HT(:,:,2) - LO%DEFORM(:,:)

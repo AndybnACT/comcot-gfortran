@@ -178,11 +178,11 @@
 	  ALLOCATE(FAULT_INFO(NUM_FLT))
 !----------------------------------------------------------------------
       write (*,*) '  '
-      write (*,*) '************** GPU-COMCOT ******************'
+      write (*,*) '************** COMCOT (gfortran)******************'
       write (*,*) '*                                          *'
-      write (*,*) '*            VERSION= G1.7                 *'
+      write (*,*) '*            VERSION= 1.7                 *'
       write (*,*) '*                                          *'
-	  write (*,*) '********************************************'
+	  write (*,*) '****************************************************'
 !----------------------------------------------------------------------
 !///// READ USER-DEFINED OPTIONS (NO. OF LAYERS, COORDINATE, GOVERN EQN.)
       CALL READ_CONFIG (LO,LA,TEND,T_INV,INI_SURF,WAVE_INFO,		&
@@ -265,7 +265,6 @@
 !......................................................................
 	  !PAUSE
 
-      CALL CUDA_BOOT(LO%R1, LO%R2, LO%R3, LO%R4, LO%R5, LO%R6, LO%R11, LO%H, LO%Z, LO%NX, LO%NY)
 !////////////////////// SIMULATION BEGINS /////////////////////////////
       WRITE (*,*) '    '
 	  WRITE (*,*) '***************** OUTPUT RESULTS ******************'
@@ -279,7 +278,6 @@
 		 CALL ALL_PRT (ISTART-1,LO,LA)
 		 IF (OUT_OPT.EQ.1 .OR. OUT_OPT.EQ.2) THEN
             DO NIC = 1,NUM_REC
-               WRITE(*,*) "[WARNING] THE FUNCTION [GET_TS] IS CURRENTLY NOT SUPPORTED ON GPU COMCOT----->[will be updated soon]"
 		       CALL GET_TS (TS_DAT,TS_LOC(NIC,1),TS_LOC(NIC,2),		&
 												LO,LA,TS_ID(NIC))
 !*			  WRITE(*,*) TS_LOC(NIC,1),TS_LOC(NIC,2),TS_DAT
@@ -298,7 +296,6 @@
 
 !.... .. CALL HOT START FUNCTION
          IF (K .EQ. START_STEP) THEN
-            WRITE(*,*) "[WARNING] THE FUNCTION [HOT_START] IS CURRENTLY NOT SUPPORTED ON GPU COMCOT"
 		    CALL HOT_START (LO,LA,START_TYPE,START_STEP)
 		 ENDIF
 !*		 ! CREATE 5 BACKUPS DURING THE ENTIRE SIMULATION DURATION
@@ -314,7 +311,6 @@
 		 IF ( INI_SURF .EQ. 3 .OR. INI_SURF .EQ. 4 ) THEN
 		    IF ( TIME.GE.LANDSLIDE_INFO%T(1) .AND.					&
 		         TIME.LE.LANDSLIDE_INFO%T(LANDSLIDE_INFO%NT) ) THEN
-               WRITE(*,*) "[WARNING] THE FUNCTION [LAND_SLIDE] IS CURRENTLY NOT SUPPORTED ON GPU COMCOT"
 		       CALL LAND_SLIDE(LO,LANDSLIDE_INFO,TIME)
 		    ENDIF
 	     ENDIF
@@ -322,25 +318,16 @@
 !////////SOLVE MASS CONSERVATION EQN FOR LAYER 1 (THE OUTEST LAYER)
          !!....CALL SEDIMENT TRANSPORT MODEL
          IF (LO%LAYCORD.NE.0 .AND. LO%SEDI_SWITCH .EQ. 0) THEN
-            WRITE(*,*) "[WARNING] THE FUNCTION [SED_TRANSPORT] IS CURRENTLY NOT SUPPORTED ON GPU COMCOT"
 		    CALL SED_TRANSPORT (LO)
 		 ENDIF
 
-         ! WRITE(*,*) "COMPUTING MASS EQ ON CPU"
-         ! call system_clock ( t1, trate, tmax )
-		 ! CALL MASS (LO)
-         ! call system_clock ( t2, trate, tmax )
-         ! write ( *, * ) 'Serial Code Elapsed real time = ', real ( t2 - t1 ) / real ( trate )
-         ! WRITE (*,*) "COMPUTING MASS EQ ON GPU"
-         CALL MASS_LAUNCH(LO%Z(:,:,1),LO%Z(:,:,2),LO%H(:,:))
+		 CALL MASS (LO)
 
 !.......SOLVE RADIATION OPEN BOUNDARY
-         ! CALL OPEN (LO)
-         CALL OPENBD_LAUNCH(LO%Z(:,:,2))
+         CALL OPEN (LO)
 
 !.......CALL WAVE MAKER TO GENERATE WAVES
          IF (INI_SURF .EQ. 2) THEN
-            WRITE(*,*) "[WARNING] THE FUNCTION [WAVE_MAKER] IS CURRENTLY NOT SUPPORTED ON GPU COMCOT"
             CALL WAVE_MAKER (TIME,LO,WAVE_INFO)
 		 ENDIF
 
@@ -348,39 +335,22 @@
          IF (BC_TYPE.EQ.3) THEN
 		    IF (TIME.GE.BCI_INFO%T(1) .AND. 						&
 							TIME.LT.BCI_INFO%T(BCI_INFO%NT)) THEN
-               WRITE(*,*) "[WARNING] THE FUNCTION [BC_INPUT] IS CURRENTLY NOT SUPPORTED ON GPU COMCOT"
 		       CALL BC_INPUT (BCI_INFO,LO,TIME)
 			ENDIF
 		 ENDIF
 !//////////////////////////////////////////////////////////////////////
 !        CALL SUBLAYER COUPLED MODEL
 !//////////////////////////////////////////////////////////////////////
-         IF (LO%NUM_CHILD .GE. 1) THEN
-             WRITE(*,*) "[WARNING] THE MULTI-LAYERS FUNCTIONALITY IS CURRENTLY NOT SUPPORTED ON GPU COMCOT"
-             CALL ALL_GRID (LO,LA)
-         ENDIF
+         IF (LO%NUM_CHILD .GE. 1) CALL ALL_GRID (LO,LA)
 !//////////////////////////////////////////////////////////////////////
 !        SOLVE MOMENTUM CONSERVATION EQN FOR LAYER 1
 !//////////////////////////////////////////////////////////////////////
-         ! WRITE(*,*) "COMPUTING MOMT EQ ON CPU"
-         ! call system_clock ( t1, trate, tmax )
-         ! CALL MOMENT (LO)
-         ! call system_clock ( t2, trate, tmax )
-         ! write ( *, * ) 'Serial Code Elapsed real time = ', real ( t2 - t1 ) / real ( trate )
-         !
-         ! WRITE(*,*) "COMPUTING MOMT EQ ON GPU"
-         CALL MOMT_LAUNCH(LO%M(:,:,2), LO%N(:,:,2), LO%Z(:,:,2))
+         CALL MOMENT (LO)
 
 !.......USE SPONGE LAYER .....
-         IF (BC_TYPE.EQ.1) THEN
-             WRITE(*,*) "[WARNING] THE FUNCTION [SPONGE_LAYER] IS CURRENTLY NOT SUPPORTED ON GPU COMCOT"
-             CALL SPONGE_LAYER(LO)
-         ENDIF
+         IF (BC_TYPE.EQ.1) CALL SPONGE_LAYER(LO)
 !*!.......WALL BOUNDARY
-         IF (BC_TYPE.EQ.2) THEN
-             WRITE(*,*) "[WARNING] THE FUNCTION [BC_WALL] IS CURRENTLY NOT SUPPORTED ON GPU COMCOT"
-             CALL BC_WALL (LO,WAVE_INFO)
-         ENDIF
+         IF (BC_TYPE.EQ.2) CALL BC_WALL (LO,WAVE_INFO)
 !......................................................................
 !       OUTPUT RESULTS AT GIVEN TIME INTERVAL (MINUTE)
 !......................................................................
@@ -390,28 +360,22 @@
 
 
 		 IF (OUT_OPT.EQ.0 .OR. OUT_OPT.EQ.2) THEN
-            CALL MAXAMP_LAUNCH()
 		    CALL MAX_AMP (LO,LA,TIME,TEND)
 		 ENDIF
 
-
-         CALL PARTICLE_TRANSPORT_LAUNCH()
-
 !.......UPDATE VARIABLES OF LAYER 01 (LO) FOR NEXT TIME STEP
-         CALL CHANGE()
+         CALL CHANGE(LO)
 !.......OUTPUT TIME SEQUENCE AND TIME HISTORY RECORDS AT T = K*LO%DT
-!!!!!!!!!!!!!!!!!!!!      COMMEMTED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
-!          WRITE (99,*) TIME                                                !
-! 		 IF (OUT_OPT.EQ.1 .OR. OUT_OPT.EQ.2) THEN                           !
-!             DO NIC = 1,NUM_REC                                            !
-! 		       CALL GET_TS (TS_DAT,TS_LOC(NIC,1),TS_LOC(NIC,2),		&       !
-! 												LO,LA,TS_ID(NIC))           !
-! !*			  WRITE(*,*) TS_LOC(NIC,1),TS_LOC(NIC,2),TS_DAT             !
-! 			   IO_UNIT = 1000+NIC                                           !
-! 		       WRITE(IO_UNIT,'(F10.5)') TS_DAT                              !
-!             ENDDO                                                         !
-! 		 END IF                                                             !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         WRITE (99,*) TIME                                                !
+		 IF (OUT_OPT.EQ.1 .OR. OUT_OPT.EQ.2) THEN                           !
+            DO NIC = 1,NUM_REC                                            !
+		       CALL GET_TS (TS_DAT,TS_LOC(NIC,1),TS_LOC(NIC,2),		&       !
+												LO,LA,TS_ID(NIC))           !
+!*			  WRITE(*,*) TS_LOC(NIC,1),TS_LOC(NIC,2),TS_DAT             !
+			   IO_UNIT = 1000+NIC                                           !
+		       WRITE(IO_UNIT,'(F10.5)') TS_DAT                              !
+            ENDDO                                                         !
+		 END IF                                                             !
        END DO
 
 !..... CLOSE ALL OPENNED DATA FILES
@@ -447,40 +411,37 @@
 
 
 !----------------------------------------------------------------------
-      SUBROUTINE CHANGE()
+      SUBROUTINE CHANGE(LO)
 !.....TRANSFER INFORMATION (FREE SURFACE ELEVATION, VOLUME FLUX IN
 !      X, Y DIRECTIONS)FROM LAST STEP TO NEXT STEP (FOR OUTEST LAYER)
 !----------------------------------------------------------------------
-!!!!!!!!!!!!!!!!!!!!      COMMEMTED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
-!     USE LAYER_PARAMS
-!     TYPE (LAYER)	:: LO
-!       IF (LO%LAYGOV .GT. 1) THEN
-!           LO%M0(:,:)   = LO%M(:,:,1)
-!           LO%N0(:,:) = LO%N(:,:,1)
-!       ENDIF
-!       LO%Z(:,:,1) = LO%Z(:,:,2)
-!       LO%M(:,:,1) = LO%M(:,:,2)
-!       LO%N(:,:,1) = LO%N(:,:,2)
-!       ! DO J=1,LO%NY
-!       !    DO I=1,LO%NX
-!       !       LO%Z(I,J,1) = LO%Z(I,J,2)
-!       !       LO%M(I,J,1) = LO%M(I,J,2)
-!       !       LO%N(I,J,1) = LO%N(I,J,2)
-! 		! 	IF (LO%LAYGOV.GT.1) THEN
-! 		!        LO%M0(I,J)  = LO%M(I,J,1)
-! 		!        LO%N0(I,J)  = LO%N(I,J,1)
-! 		! 	ENDIF
-!       !    END DO
-!       ! END DO
-! !.....UPDATE BATHYMETRY IF TRANSIENT SEAFLOOR MOTION IS ENABLED
-! 	  IF (LO%INI_SWITCH.EQ.3 .OR. LO%INI_SWITCH.EQ.4) THEN
-! 	     LO%HT(:,:,1) = LO%HT(:,:,2)
-! 	     LO%H(:,:) = LO%H(:,:) + LO%HT(:,:,2) - LO%HT(:,:,1)
-! 	  ENDIF
-!!!!!!!!!!!!!!!!!!!!      COMMEMTED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
+    USE LAYER_PARAMS
+    TYPE (LAYER)	:: LO
+      IF (LO%LAYGOV .GT. 1) THEN
+          LO%M0(:,:)   = LO%M(:,:,1)
+          LO%N0(:,:) = LO%N(:,:,1)
+      ENDIF
+      LO%Z(:,:,1) = LO%Z(:,:,2)
+      LO%M(:,:,1) = LO%M(:,:,2)
+      LO%N(:,:,1) = LO%N(:,:,2)
+      ! DO J=1,LO%NY
+      !    DO I=1,LO%NX
+      !       LO%Z(I,J,1) = LO%Z(I,J,2)
+      !       LO%M(I,J,1) = LO%M(I,J,2)
+      !       LO%N(I,J,1) = LO%N(I,J,2)
+		! 	IF (LO%LAYGOV.GT.1) THEN
+		!        LO%M0(I,J)  = LO%M(I,J,1)
+		!        LO%N0(I,J)  = LO%N(I,J,1)
+		! 	ENDIF
+      !    END DO
+      ! END DO
+!.....UPDATE BATHYMETRY IF TRANSIENT SEAFLOOR MOTION IS ENABLED
+	  IF (LO%INI_SWITCH.EQ.3 .OR. LO%INI_SWITCH.EQ.4) THEN
+	     LO%HT(:,:,1) = LO%HT(:,:,2)
+	     LO%H(:,:) = LO%H(:,:) + LO%HT(:,:,2) - LO%HT(:,:,1)
+	  ENDIF
 
-      CALL CUDA_UPDATE()
-!
+
       RETURN
       END
 
