@@ -3,21 +3,11 @@
 # LAST REVISED: TAO CHIU  MARCH 2018                                #
 #####################################################################
 
-### Plese specify your fortran, cuda compiler and GPU's compute capabilities #####
+### Plese specify your fortran compiler ##########################################
 FC          = gfortran
 FC_FLAGS    = -O2
 
-
-NVCC        = nvcc
-NVFLAGS     =
-NVCC_OPT    = -arch=sm_61 -lineinfo
-NVLIB       = -L/usr/local/cuda-9.2/lib64
 ##################################################################################
-
-
-NV_OBJECTS  = GPUcomcot.o GPUMass_s.o GPUMoment_s.o\
-              GPUOpen_BD.o GPUOutput.o
-NV_DEVOBJ   = nvobj.o
 
 
 F90_MOD     = type_module.o
@@ -29,8 +19,8 @@ F90_OBJECTS = comcot.o initialization.o output.o\
 
 
 .PHONY: cleandat cleanall cleanf90 cleancu clean
-comcot: $(F90_OBJECTS) $(NV_OBJECTS) $(NV_DEVOBJ)
-	$(FC) -lstdc++ $(FC_FLAGS) $(F90_OBJECTS) $(F90_MOD) $(NVLIB) -lcudart $(NV_OBJECTS) $(NV_DEVOBJ) -o comcot
+comcot: $(F90_OBJECTS)
+	$(FC) $(FC_FLAGS) $(F90_OBJECTS) $(F90_MOD) -o comcot
 
 cleandat:
 	for file in *.[dt][ax]t ; do\
@@ -48,34 +38,12 @@ cleandat:
 	done
 cleanf90:
 	rm comcot $(F90_OBJECTS) $(F90_MOD)
-cleancu:
-	rm $(NV_OBJECTS) $(NV_DEVOBJ)
 clean:
 	make cleanf90
-	make cleancu
 cleanall:
 	make clean
 	make cleandat
 
-########################## RULES FOR CUDA C ###########################
-$(NV_DEVOBJ): $(NV_OBJECTS)
-	$(NVCC) $(NVCC_OPT) --device-link $(NV_OBJECTS) -o $(NV_DEVOBJ)
-$(NV_OBJECTS) $(NV_DEVOBJ): GPUConfig.h GPUHeader.h
-GPUcomcot.o: GPUcomcot.cu
-	$(NVCC) -c -rdc=true $(NVCC_OPT) $(NVFLAGS) GPUcomcot.cu
-
-GPUMass_s.o: GPUMass_s.cu
-	$(NVCC) -c -rdc=true $(NVCC_OPT) $(NVFLAGS) GPUMass_s.cu
-
-GPUMoment_s.o: GPUMoment_s.cu
-	$(NVCC) -c -rdc=true $(NVCC_OPT) $(NVFLAGS) GPUMoment_s.cu
-
-GPUOpen_BD.o: GPUOpen_BD.cu GPUOpen_BD.h
-	$(NVCC) -c -rdc=true $(NVCC_OPT) $(NVFLAGS) GPUOpen_BD.cu
-
-GPUOutput.o: GPUOutput.cu
-	$(NVCC) -c -rdc=true $(NVCC_OPT) $(NVFLAGS) GPUOutput.cu
-#######################################################################
 
 ################# RULES FOR FORTRAN #################
 $(F90_MOD): type_module.f90

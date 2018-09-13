@@ -746,12 +746,6 @@
 	  COMMON /CONS/ ELMAX,GRAV,PI,R_EARTH,GX,EPS,ZERO,ONE,NUM_GRID,	&
 					NUM_FLT,V_LIMIT,RAD_DEG,RAD_MIN
 
-     if ( k .GT. 0 ) then
-         CALL CUDA_GETZ(LO%Z(:,:,1))
-         CALL CUDA_GETMN(LO%M(:,:,1), LO%N(:,:,1))
-     end if
-
-
       CALL DATA_PRT (K,LO)
       DO I=1,NUM_GRID
 	     IF (LA(I)%LAYSWITCH .EQ. 0)  CALL DATA_PRT (K,LA(I))
@@ -811,10 +805,10 @@
       IF (LO%FLUXSWITCH .LE. 1 .OR. LO%FLUXSWITCH .EQ. 9) THEN
          WRITE (FNAME,1) LO%ID,K
  1       FORMAT('z_',I2.2,'_',I6.6,'.dat')
-         OPEN (25,FILE=FNAME,STATUS='UNKNOWN',form="unformatted")
-         !DO J = JS,JE
-            WRITE (25) (Z(:,:))!(I,J),I=IS,IE)
-         !ENDDO
+         OPEN (25,FILE=FNAME,STATUS='UNKNOWN')!,form="unformatted")
+         DO J = JS,JE
+           WRITE (25,'(15F9.4)') (Z(I,J),I=IS,IE)
+         ENDDO
          CLOSE (25)
 	  ENDIF
 !.....OUTPUT VOLUME FLUX
@@ -822,28 +816,28 @@
          WRITE (FNAME,2) LO%ID,K
  2       FORMAT('m_',I2.2,'_',I6.6,'.dat')
 
-         OPEN (25,FILE=FNAME,STATUS='UNKNOWN',form="unformatted")
-         !DO J = JS,JE
-           WRITE (25) (LO%M(:,:,1))!(I,J,1),I=IS,IE)
-         !ENDDO
+         OPEN (25,FILE=FNAME,STATUS='UNKNOWN')!,form="unformatted")
+         DO J = JS,JE
+           WRITE (25,'(15F9.3)') (LO%M(I,J,1),I=IS,IE)
+         ENDDO
          CLOSE (25)
          WRITE (FNAME,3) LO%ID,K
  3       FORMAT('n_',I2.2,'_',I6.6,'.dat')
 
-         OPEN (25,FILE=FNAME,STATUS='UNKNOWN',form="unformatted")
-         !DO J = JS,JE
-           WRITE (25) (LO%N(:,:,1))!(I,J,1),I=IS,IE)
-         !ENDDO
+         OPEN (25,FILE=FNAME,STATUS='UNKNOWN')!,form="unformatted")
+         DO J = JS,JE
+           WRITE (25,'(15F9.3)') (LO%N(I,J,1),I=IS,IE)
+         ENDDO
          CLOSE (25)
 	  ENDIF
 
 	  IF (LO%SEDI_SWITCH .EQ. 0) THEN
          WRITE (FNAME,4) LO%ID,K
  4       FORMAT('s_',I2.2,'_',I6.6,'.dat')
-         OPEN (25,FILE=FNAME,STATUS='UNKNOWN',form="unformatted")
-         !DO J = JS,JE
-            WRITE (25) (LO%DH(:,:,2))!(I,J,2),I=IS,IE)
-         !ENDDO
+         OPEN (25,FILE=FNAME,STATUS='UNKNOWN')!,form="unformatted")
+         DO J = JS,JE
+            WRITE (25,'(15F9.3)') (LO%DH(I,J,2),I=IS,IE)
+         ENDDO
          CLOSE (25)
       ENDIF
 
@@ -871,37 +865,32 @@
 	  CHARACTER(LEN=40) FNAME4,FNAME5,FNAME6
 	  COMMON /CONS/ ELMAX,GRAV,PI,R_EARTH,GX,EPS,ZERO,ONE,NUM_GRID,	&
 					NUM_FLT,V_LIMIT,RAD_DEG,RAD_MIN
-     !!!!!!!!!!!!!!!!!!!!      COMMEMT ADDED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
       !OBTAIN MAXIMUM ELEVATION AND DEPRESSION FOR THE OUTEST LAYER
-      ! DO I = 1,LO%NX
-	  !    DO J = 1,LO%NY
-		!     IF (LO%H(I,J)+LO%Z(I,J,2) .GT. GX) THEN
-		! 		IF (LO%Z(I,J,2).GT.LO%Z_MAX(I,J))					&
-		! 							LO%Z_MAX(I,J) = LO%Z(I,J,2)
-		! 		! IF (LO%Z(I,J,2).LT.LO%Z_MIN(I,J))					&
-		! 		! 					LO%Z_MIN(I,J) = LO%Z(I,J,2)
-		! 	ENDIF
-		!  ENDDO
-      ! ENDDO
-	  !OBTAIN MAX ELEVATION AND DEPRESSION FOR THE INNER LAYERS, LA
-
-
-
-	  ! DO K = 1,NUM_GRID
-		!  IF (LA(K)%LAYSWITCH.EQ.0) THEN
-      !       DO I = 1,LA(K)%NX
-	  !          DO J = 1,LA(K)%NY
-		!           IF (LA(K)%H(I,J)+LA(K)%Z(I,J,2) .GT. GX) THEN
-		! 		     IF (LA(K)%Z(I,J,2).GT.LA(K)%Z_MAX(I,J))		&
-		! 						LA(K)%Z_MAX(I,J) = LA(K)%Z(I,J,2)
-		! 		     IF (LA(K)%Z(I,J,2).LT.LA(K)%Z_MIN(I,J))		&
-		! 						LA(K)%Z_MIN(I,J) = LA(K)%Z(I,J,2)
-		! 	      ENDIF
-		!        ENDDO
-      !       ENDDO
-		!  ENDIF
-	  ! ENDDO
-      !!!!!!!!!!!!!!!!!!!!      COMMEMT ADDED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
+      DO I = 1,LO%NX
+	     DO J = 1,LO%NY
+		    IF (LO%H(I,J)+LO%Z(I,J,2) .GT. GX) THEN
+				IF (LO%Z(I,J,2).GT.LO%Z_MAX(I,J))					&
+									LO%Z_MAX(I,J) = LO%Z(I,J,2)
+				IF (LO%Z(I,J,2).LT.LO%Z_MIN(I,J))					&
+									LO%Z_MIN(I,J) = LO%Z(I,J,2)
+			ENDIF
+		 ENDDO
+      ENDDO
+	  ! OBTAIN MAX ELEVATION AND DEPRESSION FOR THE INNER LAYERS, LA
+	  DO K = 1,NUM_GRID
+		 IF (LA(K)%LAYSWITCH.EQ.0) THEN
+            DO I = 1,LA(K)%NX
+	           DO J = 1,LA(K)%NY
+		          IF (LA(K)%H(I,J)+LA(K)%Z(I,J,2) .GT. GX) THEN
+				     IF (LA(K)%Z(I,J,2).GT.LA(K)%Z_MAX(I,J))		&
+								LA(K)%Z_MAX(I,J) = LA(K)%Z(I,J,2)
+				     IF (LA(K)%Z(I,J,2).LT.LA(K)%Z_MIN(I,J))		&
+								LA(K)%Z_MIN(I,J) = LA(K)%Z(I,J,2)
+			      ENDIF
+		       ENDDO
+            ENDDO
+		 ENDIF
+	  ENDDO
 
 !.....WRITE THE MAXIMUM ELEVATION AND DEPRESSION INTO DATA FILE
 !	  EVERY ONE HOUR AND AT THE END OF THE SIMULATION
@@ -915,7 +904,6 @@
       K = NINT(TIME/3600.0)
 	  SECS = 3600.0*K
       IF (K2.GT.K1 .OR. TIME.GE.TEND-2.0*LO%DT) THEN
-         CALL CUDA_GETZMAX(LO%Z_MAX(:,:))
 		 ALLOCATE(TMP(LO%NX,LO%NY))
 		 DO I = 1,LO%NX
 		    DO J = 1,LO%NY
@@ -933,97 +921,95 @@
          WRITE (FNAME1,1) LO%ID,K
  1       FORMAT('zmax_layer',I2.2,'_',I4.4,'hrs.dat')
          IF (TIME.GE.TEND-2.0*LO%DT) FNAME1 = 'zmax_layer01.dat'
-         OPEN (25,FILE=FNAME1,STATUS='UNKNOWN',form="unformatted")
-         !DO J = 1,LO%NY
-		    WRITE (25) (TMP(:,:))!(I,J),I=1,LO%NX)
-         !ENDDO
+         OPEN (25,FILE=FNAME1,STATUS='UNKNOWN')!,form="unformatted")
+         DO J = 1,LO%NY
+            WRITE (25,'(15F9.4)') (TMP(I,J),I=1,LO%NX)
+         ENDDO
          CLOSE (25)
- ! !!!!!!!!!!!!!!!!!!!!      COMMEMT ADDED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
-	! 	 DO I = 1,LO%NX
-	! 	    DO J = 1,LO%NY
-	! 		   IF ((LO%H(I,J)+LO%Z_MIN(I,J)).LE.GX .AND. 			&
-	! 										LO%H(I,J).LT.ZERO) THEN
-	! 		      TMP(I,J) = 0.0
-	! 		   ELSE
-	! 		      TMP(I,J) = LO%Z_MIN(I,J)
-	! 			  IF (ABS(LO%TIDE_LEVEL).GT.GX) THEN
-	! 			     TMP(I,J) = LO%Z_MIN(I,J) + LO%TIDE_LEVEL
-	! 			  ENDIF
-	! 		   ENDIF
-	! 	    ENDDO
-	! 	 ENDDO
- !         WRITE (FNAME2,2) LO%ID,K
- ! 2       FORMAT('zmin_layer',I2.2,'_',I4.4,'hrs.dat')
- !         IF (TIME.GE.TEND-2.0*LO%DT) FNAME2 = 'zmin_layer01.dat'
- !         OPEN (25,FILE=FNAME2,STATUS='UNKNOWN')
- !         DO J = 1,LO%NY
- !            WRITE (25,'(15F9.4)') (TMP(I,J),I=1,LO%NX)
- !         ENDDO
- !         CLOSE (25)
-!!!!!!!!!!!!!!!!!!!!      COMMEMT ADDED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		 DO I = 1,LO%NX
+		    DO J = 1,LO%NY
+			   IF ((LO%H(I,J)+LO%Z_MIN(I,J)).LE.GX .AND. 			&
+											LO%H(I,J).LT.ZERO) THEN
+			      TMP(I,J) = 0.0
+			   ELSE
+			      TMP(I,J) = LO%Z_MIN(I,J)
+				  IF (ABS(LO%TIDE_LEVEL).GT.GX) THEN
+				     TMP(I,J) = LO%Z_MIN(I,J) + LO%TIDE_LEVEL
+				  ENDIF
+			   ENDIF
+		    ENDDO
+		 ENDDO
+         WRITE (FNAME2,2) LO%ID,K
+ 2       FORMAT('zmin_layer',I2.2,'_',I4.4,'hrs.dat')
+         IF (TIME.GE.TEND-2.0*LO%DT) FNAME2 = 'zmin_layer01.dat'
+         OPEN (25,FILE=FNAME2,STATUS='UNKNOWN')
+         DO J = 1,LO%NY
+            WRITE (25,'(15F9.4)') (TMP(I,J),I=1,LO%NX)
+         ENDDO
+         CLOSE (25)
+
 
 		 DEALLOCATE(TMP,STAT = ISTAT)
-!!!!!!!!!!!!!!!!!!!!      COMMEMT ADDED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
- !         DO KK = 1,NUM_GRID
- !            IF (LA(KK)%LAYSWITCH .EQ. 0 ) THEN
-	! 		   ALLOCATE(TMP(LA(KK)%NX,LA(KK)%NY))
-	! 		   TMP = 0.0
-	! 	 	   DO I = 2,LA(KK)%NX
-	! 	          DO J = 2,LA(KK)%NY
-	! 		         IF ((LA(KK)%H(I,J)+LA(KK)%Z_MAX(I,J)).LE.GX 	&
-	! 							.AND. LA(KK)%H(I,J).LT.ZERO) THEN
-	! 		            TMP(I,J) = 0.0
-	! 		         ELSE
-	! 		            TMP(I,J) = LA(KK)%Z_MAX(I,J)
-	! 			        IF (ABS(LA(KK)%TIDE_LEVEL).GT.GX) THEN
-	! 			           TMP(I,J) = LA(KK)%Z_MAX(I,J)+LA(KK)%TIDE_LEVEL
-	! 			        ENDIF
-	! 		         ENDIF
-	! 	          ENDDO
-	! 	       ENDDO
-	! 		   IF (TIME.GE.TEND-2.0*LO%DT) THEN
- !                  WRITE (FNAME3,5) LA(KK)%ID
- ! 5                FORMAT('zmax_layer',I2.2,'.dat')
-	! 		   ELSE
- !                  WRITE (FNAME3,3) LA(KK)%ID,K
- ! 3                FORMAT('zmax_layer',I2.2,'_',I4.4,'hrs.dat')
- !               ENDIF
- !               OPEN (25,FILE=FNAME3,STATUS='UNKNOWN')
- !               DO J = 2,LA(KK)%NY
- !             	  WRITE (25,'(15F9.4)') (TMP(I,J),I=2,LA(KK)%NX)
- !               ENDDO
- !               CLOSE (25)
- !
-	! 		   TMP = 0.0
-	! 	 	   DO I = 2,LA(KK)%NX
-	! 	          DO J = 2,LA(KK)%NY
-	! 		         IF ((LA(KK)%H(I,J)+LA(KK)%Z_MIN(I,J)).LE.GX 	&
-	! 							.AND. LA(KK)%H(I,J).LT.ZERO) THEN
-	! 		            TMP(I,J) = 0.0
-	! 		         ELSE
-	! 		            TMP(I,J) = LA(KK)%Z_MIN(I,J)
-	! 			        IF (ABS(LA(KK)%TIDE_LEVEL).GT.GX) THEN
-	! 			           TMP(I,J) = LA(KK)%Z_MIN(I,J)+LA(KK)%TIDE_LEVEL
-	! 			        ENDIF
-	! 		         ENDIF
-	! 	          ENDDO
-	! 	       ENDDO
-	! 		   IF (TIME.GE.TEND-2.0*LO%DT) THEN
- !                  WRITE (FNAME4,6) LA(KK)%ID
- ! 6                FORMAT('zmin_layer',I2.2,'.dat')
-	! 		   ELSE
- !                  WRITE (FNAME4,4) LA(KK)%ID,K
- ! 4                FORMAT('zmin_layer',I2.2,'_',I4.4,'hrs.dat')
- !               ENDIF
- !               OPEN (25,FILE=FNAME4,STATUS='UNKNOWN')
- !               DO J = 2,LA(KK)%NY
- !               	  WRITE (25,'(15F9.4)') (TMP(I,J),I=2,LA(KK)%NX)
- !               ENDDO
- !               CLOSE (25)
-	! 		   DEALLOCATE(TMP,STAT = ISTAT)
- !            ENDIF
-	! 	 ENDDO
-    !!!!!!!!!!!!!!!!!!!!      COMMEMT ADDED BY TAO     !!!!!!!!!!!!!!!!!!!!!!!!!!
+         DO KK = 1,NUM_GRID
+            IF (LA(KK)%LAYSWITCH .EQ. 0 ) THEN
+			   ALLOCATE(TMP(LA(KK)%NX,LA(KK)%NY))
+			   TMP = 0.0
+		 	   DO I = 2,LA(KK)%NX
+		          DO J = 2,LA(KK)%NY
+			         IF ((LA(KK)%H(I,J)+LA(KK)%Z_MAX(I,J)).LE.GX 	&
+								.AND. LA(KK)%H(I,J).LT.ZERO) THEN
+			            TMP(I,J) = 0.0
+			         ELSE
+			            TMP(I,J) = LA(KK)%Z_MAX(I,J)
+				        IF (ABS(LA(KK)%TIDE_LEVEL).GT.GX) THEN
+				           TMP(I,J) = LA(KK)%Z_MAX(I,J)+LA(KK)%TIDE_LEVEL
+				        ENDIF
+			         ENDIF
+		          ENDDO
+		       ENDDO
+			   IF (TIME.GE.TEND-2.0*LO%DT) THEN
+                  WRITE (FNAME3,5) LA(KK)%ID
+ 5                FORMAT('zmax_layer',I2.2,'.dat')
+			   ELSE
+                  WRITE (FNAME3,3) LA(KK)%ID,K
+ 3                FORMAT('zmax_layer',I2.2,'_',I4.4,'hrs.dat')
+               ENDIF
+               OPEN (25,FILE=FNAME3,STATUS='UNKNOWN')
+               DO J = 2,LA(KK)%NY
+             	  WRITE (25,'(15F9.4)') (TMP(I,J),I=2,LA(KK)%NX)
+               ENDDO
+               CLOSE (25)
+
+			   TMP = 0.0
+		 	   DO I = 2,LA(KK)%NX
+		          DO J = 2,LA(KK)%NY
+			         IF ((LA(KK)%H(I,J)+LA(KK)%Z_MIN(I,J)).LE.GX 	&
+								.AND. LA(KK)%H(I,J).LT.ZERO) THEN
+			            TMP(I,J) = 0.0
+			         ELSE
+			            TMP(I,J) = LA(KK)%Z_MIN(I,J)
+				        IF (ABS(LA(KK)%TIDE_LEVEL).GT.GX) THEN
+				           TMP(I,J) = LA(KK)%Z_MIN(I,J)+LA(KK)%TIDE_LEVEL
+				        ENDIF
+			         ENDIF
+		          ENDDO
+		       ENDDO
+			   IF (TIME.GE.TEND-2.0*LO%DT) THEN
+                  WRITE (FNAME4,6) LA(KK)%ID
+ 6                FORMAT('zmin_layer',I2.2,'.dat')
+			   ELSE
+                  WRITE (FNAME4,4) LA(KK)%ID,K
+ 4                FORMAT('zmin_layer',I2.2,'_',I4.4,'hrs.dat')
+               ENDIF
+               OPEN (25,FILE=FNAME4,STATUS='UNKNOWN')
+               DO J = 2,LA(KK)%NY
+               	  WRITE (25,'(15F9.4)') (TMP(I,J),I=2,LA(KK)%NX)
+               ENDDO
+               CLOSE (25)
+			   DEALLOCATE(TMP,STAT = ISTAT)
+            ENDIF
+		 ENDDO
 	  ENDIF
 
 
