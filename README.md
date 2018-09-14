@@ -1,8 +1,7 @@
 # comcot (gfortran)
 
- -  I've make comcot compatiable to gfortran since I started the GPU-comcot project. However, the original comcot, which runs on CPU serially, did not remain on my git history. Besides, I've heard of demands on gfortran compatiable comcot recently and it takes quite some efforts to transfer from ifort to gfortran for beginer who's not familiar with fortran. Therefore, I made this repo to respond the needs and make it as a benchmark to be able to test the speedup against GPU-comcot.
+ -  I've made comcot compatiable to gfortran since I started the GPU-comcot project. However, the original comcot, which runs on CPU serially, did not remain on my git history. Besides, I've heard of demands on gfortran compatiable comcot recently and it takes quite some efforts to transfer from ifort to gfortran for beginer who's not familiar with fortran. Therefore, I made this repo to respond the needs and make it as a benchmark to be able to test the speedup against GPU-comcot.
 
-xxx
 ---
 
 ## **Requirements**
