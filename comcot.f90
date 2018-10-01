@@ -424,7 +424,9 @@
       LO%Z(:,:,1) = LO%Z(:,:,2)
       LO%M(:,:,1) = LO%M(:,:,2)
       LO%N(:,:,1) = LO%N(:,:,2)
-      LO%DZ(:,:,1) = LO%DZ(:,:,2)
+      IF (LO%LAYGOV .GE. 1) THEN      
+          LO%DZ(:,:,1) = LO%DZ(:,:,2)
+      ENDIF
       ! DO J=1,LO%NY
       !    DO I=1,LO%NX
       !       LO%Z(I,J,1) = LO%Z(I,J,2)

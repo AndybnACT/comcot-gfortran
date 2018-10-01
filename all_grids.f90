@@ -321,11 +321,14 @@
 
       LO%Z(1,:,2) = LO%Z(2,:,2)
       LO%Z(:,1,2) = LO%Z(:,2,2)
-
+      IF (LO%LAYGOV .GE. 1) THEN
+          LO%DZ(1,:,2) = LO%DZ(2,:,2)
+          LO%DZ(:,1,2) = LO%DZ(:,2,2)
+          LO%DZ(:,:,1) = LO%DZ(:,:,2)
+      ENDIF
       LO%Z(:,:,1) = LO%Z(:,:,2)
       LO%M(:,:,1) = LO%M(:,:,2)
       LO%N(:,:,1) = LO%N(:,:,2)
-      LO%DZ(:,:,1) = LO%DZ(:,:,2)
 	  IF (LO%LAYGOV.GT.1) THEN
 	     LO%M0(:,:)  = LO%M(:,:,1)
 	  	 LO%N0(:,:)  = LO%N(:,:,1)

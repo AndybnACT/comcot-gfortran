@@ -5,8 +5,7 @@
 
 ### Plese specify your fortran compiler ##########################################
 FC          = gfortran
-FC_FLAGS    = -O2
-
+FC_FLAGS    = -O2 #-fdefault-real-8 
 ##################################################################################
 
 
