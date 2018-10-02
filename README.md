@@ -57,7 +57,7 @@ xxx
 
 ## Features
 
-![](https://i.imgur.com/NabRZ4m.gif | width=800)
+![](https://i.imgur.com/cFhekyK.gif|width=2080)
 
 
 ## **Acknowledgements**
