@@ -63,3 +63,6 @@ xxx
 ## **Acknowledgements**
 
 gfortran compatible version of COMCOT was developed by Tao, Chiu at Tsunami reseach group, IHOS, NCU. The goal of this work is to librate, coporate ideas with the community and accelerate the development of a high-throughput tsunami warning system at a relatively low cost. Original COMCOT version can be found at [here](http://223.4.213.26/archive/tsunami/cornell/comcot_down.htm).
+
+##### Note:
+- [ ] I should integrate ZH_out into ZH_dat in order to prevent redundant loads of H variable
