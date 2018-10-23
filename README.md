@@ -10,12 +10,19 @@
 
 >(possible supported version/developing environment):
 
-- gfortran (4.1.2-46/4.8)
+- gfortran (4.1.2-46 ~ 8.2.0/4.8)
 
 - GNU make (/3.82)
 
+#### Notes: Platforms other than Linux
+##### MacOS
+ - gfortran compiler can be equipped with `gcc` at version 8. Therefore, the easiest way to install `gcc` is by `brew install` command , then you will have `gfortran` ready. Or reference the GNU [site](https://gcc.gnu.org) to build `gcc` by several of ways other than `brew`. [Here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS) is the link instructing how to build precompiled `gcc` binary package for MacOS.
+##### Windows
+ - [Precompiled gcc](https://gcc.gnu.org/wiki/GFortranBinaries#Windows)
+
 
 ## **Installation**
+
 
 ### clone
 
@@ -27,10 +34,8 @@ git clone https://github.com/HandsomeAndy/comcot-gfortran.git
 
 #### GNU solftwares
 
-- Generally, gnu `make` and `gfortran` are pre-installed on linux machines. Try `make --version` and `gfortran --version` to check if they exist. If not, use package manager to install them.    
+- Generally, gnu `make` and `gfortran` are pre-installed on linux machines. Try `make --version` and `gfortran --version` to check if they exist. See 'Notes' for more informations.   
 
-
-#### Makefile
 
 ### Install
 
@@ -49,11 +54,6 @@ make
  ```shell
  ./comcot
  ```
-
-## Post-Processing
-
-xxx
-
 
 ## Features
 
