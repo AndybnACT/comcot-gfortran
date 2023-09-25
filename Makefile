@@ -1,11 +1,10 @@
 ######################################################################
 # Makefile: GPU-Cornell Multigrid Coupled Tsunami (GPUCOMCOT) Model #
-# LAST REVISED: TAO CHIU  MARCH 2018                                #
 #####################################################################
 
 ### Plese specify your fortran compiler ##########################################
 FC          = gfortran
-FC_FLAGS    = -O2 #-fdefault-real-8 
+FC_FLAGS    = -fallow-argument-mismatch -O2 #-fdefault-real-8 
 ##################################################################################
 
 
